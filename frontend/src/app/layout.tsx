@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
 import StoreProvider from "./StoreProvider";
+import Header from "@/components/Header";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -16,7 +17,7 @@ const geistMono = localFont({
 
 export const metadata: Metadata = {
   title: "Product",
-  description: "Create a product and share it with the world",
+  description: "Create a product and share it",
 };
 
 export default function RootLayout({
@@ -31,6 +32,7 @@ export default function RootLayout({
       >
         <StoreProvider>
           <div className="w-full min-h-screen flex flex-col justify-center items-center">
+            <Header />
             <main className="w-full flex-1 flex justify-center items-center my-6">
               {children}
             </main>
