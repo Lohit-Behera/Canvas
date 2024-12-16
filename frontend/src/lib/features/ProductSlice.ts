@@ -7,10 +7,24 @@ type CreateProduct = {
   name: string;
   description: string;
   affiliateLink: string;
-  amount: number;
+  price: number;
   category: string;
   quantity: number;
   image: File;
+};
+
+type Product = {
+  _id: string;
+  name: string;
+  description: string;
+  affiliateLink: string;
+  price: number;
+  category: string;
+  quantity: number;
+  image: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
 };
 
 // fetch functions
@@ -65,7 +79,7 @@ const productSlice = createSlice({
     createProductStatus: "idle",
     createProductError: {},
 
-    getProduct: { data: {} },
+    getProduct: { data: {} as Product },
     getProductStatus: "idle",
     getProductError: {},
   },

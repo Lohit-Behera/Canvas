@@ -5,7 +5,7 @@ import { uploadFile } from "../utils/cloudinary";
 
 const createProduct = asyncHandler(async (req, res) => {
   // get the data from the request
-  const { name, description, affiliateLink, amount, category, quantity } =
+  const { name, description, affiliateLink, price, category, quantity } =
     req.body;
 
   // validate the data
@@ -14,7 +14,7 @@ const createProduct = asyncHandler(async (req, res) => {
     !name ||
     !description ||
     !affiliateLink ||
-    !amount ||
+    !price ||
     !category ||
     !quantity
   ) {
@@ -40,10 +40,10 @@ const createProduct = asyncHandler(async (req, res) => {
       );
   }
 
-  if (Number.isNaN(Number(amount)) || Number.isNaN(Number(quantity))) {
+  if (Number.isNaN(Number(price)) || Number.isNaN(Number(quantity))) {
     return res
       .status(400)
-      .json(new ApiResponse(400, null, "Amount and quantity must be numbers"));
+      .json(new ApiResponse(400, null, "Price and quantity must be numbers"));
   }
 
   // Validate category
@@ -83,7 +83,7 @@ const createProduct = asyncHandler(async (req, res) => {
     name,
     description,
     affiliateLink,
-    amount: Number(amount),
+    price: Number(price),
     category,
     quantity: Number(quantity),
     image: imageUrl,

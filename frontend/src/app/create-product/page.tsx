@@ -57,7 +57,7 @@ const createProductSchema = z.object({
     .refine((file) => ["image/jpeg", "image/png"].includes(file?.type), {
       message: "Only .jpg and .png formats are supported.",
     }),
-  amount: z
+  price: z
     .number()
     .positive({ message: "Amount must be a positive number" })
     .min(1, { message: "Amount must be at least 1" }),
@@ -83,7 +83,7 @@ function page() {
       name: "",
       description: "",
       affiliateLink: "",
-      amount: 0,
+      price: 0,
       category: "",
       quantity: 0,
       image: undefined,
@@ -206,14 +206,14 @@ function page() {
             />
             <FormField
               control={form.control}
-              name="amount"
+              name="price"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Amount</FormLabel>
+                  <FormLabel>Price</FormLabel>
                   <FormControl>
                     <Input
                       type="number"
-                      placeholder="Amount"
+                      placeholder="price"
                       {...field}
                       onChange={(e) =>
                         field.onChange(
