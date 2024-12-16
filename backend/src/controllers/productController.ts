@@ -7,7 +7,6 @@ const createProduct = asyncHandler(async (req, res) => {
   // get the data from the request
   const { name, description, affiliateLink, amount, category, quantity } =
     req.body;
-  console.log(req.body);
 
   // validate the data
   // Validate required fields
@@ -41,7 +40,7 @@ const createProduct = asyncHandler(async (req, res) => {
       );
   }
 
-  if (typeof amount !== "number" || typeof quantity !== "number") {
+  if (Number.isNaN(Number(amount)) || Number.isNaN(Number(quantity))) {
     return res
       .status(400)
       .json(new ApiResponse(400, null, "Amount and quantity must be numbers"));
@@ -84,9 +83,9 @@ const createProduct = asyncHandler(async (req, res) => {
     name,
     description,
     affiliateLink,
-    amount,
+    amount: Number(amount),
     category,
-    quantity,
+    quantity: Number(quantity),
     image: imageUrl,
   });
   // validate the product creation
@@ -99,7 +98,9 @@ const createProduct = asyncHandler(async (req, res) => {
   // send the response
   return res
     .status(201)
-    .json(new ApiResponse(201, createdProduct, "Product created successfully"));
+    .json(
+      new ApiResponse(201, createdProduct._id, "Product created successfully")
+    );
 });
 
 const getProduct = asyncHandler(async (req, res) => {
