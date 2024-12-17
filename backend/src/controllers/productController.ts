@@ -120,4 +120,22 @@ const getProduct = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, product, "Product found successfully"));
 });
 
-export { createProduct, getProduct };
+const getAllProducts = asyncHandler(async (req, res) => {
+  // get all products
+  const products = await Product.find()
+    .sort({ createdAt: -1 })
+    .select("_id name affiliateLink price category image");
+
+  // validate the products
+  if (!products) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Products not found"));
+  }
+  // send the response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, products, "Products found successfully"));
+});
+
+export { createProduct, getProduct, getAllProducts };

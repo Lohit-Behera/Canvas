@@ -27,6 +27,15 @@ type Product = {
   __v: number;
 };
 
+type AllProducts = {
+  _id: string;
+  name: string;
+  affiliateLink: string;
+  price: number;
+  image: string;
+  category: string;
+};
+
 // fetch functions
 export const fetchCreateProduct = createAsyncThunk(
   "product/createProduct",
@@ -71,6 +80,22 @@ export const fetchGetProduct = createAsyncThunk(
   }
 );
 
+export const fetchGetAllProducts = createAsyncThunk(
+  "product/getAllProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(`${baseUrl}/api/v1/products/get/all`);
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 // slice
 const productSlice = createSlice({
   name: "product",
@@ -82,6 +107,10 @@ const productSlice = createSlice({
     getProduct: { data: {} as Product },
     getProductStatus: "idle",
     getProductError: {},
+
+    getAllProducts: { data: [] as AllProducts[] },
+    getAllProductsStatus: "idle",
+    getAllProductsError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -110,6 +139,19 @@ const productSlice = createSlice({
       .addCase(fetchGetProduct.rejected, (state, action) => {
         state.getProductStatus = "failed";
         state.getProductError = action.payload || "Failed to get product";
+      })
+
+      // Get All Products
+      .addCase(fetchGetAllProducts.pending, (state) => {
+        state.getAllProductsStatus = "loading";
+      })
+      .addCase(fetchGetAllProducts.fulfilled, (state, action) => {
+        state.getAllProductsStatus = "succeeded";
+        state.getAllProducts = action.payload;
+      })
+      .addCase(fetchGetAllProducts.rejected, (state, action) => {
+        state.getAllProductsStatus = "failed";
+        state.getAllProductsError = action.payload || "Failed to get products";
       });
   },
 });
