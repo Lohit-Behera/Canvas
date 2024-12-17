@@ -111,7 +111,6 @@ function page() {
     <Card className="w-full md:w-[95%] lg:w-[90%]">
       <CardHeader>
         <CardTitle>Create Product</CardTitle>
-        <CardDescription>Card Description</CardDescription>
       </CardHeader>
       <CardContent>
         <Form {...form}>
@@ -238,7 +237,7 @@ function page() {
                       onChange={(e) =>
                         field.onChange(e.target.files?.[0] || null)
                       }
-                      placeholder="Avatar"
+                      placeholder="Image"
                     />
                   </FormControl>
                   <FormMessage />

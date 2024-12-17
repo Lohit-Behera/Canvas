@@ -39,7 +39,7 @@ function page() {
                   className="min-h-56 rounded-lg bg-card grid gap-2 border "
                 >
                   <div className="w-full h-44 overflow-hidden">
-                    <Link href={`/quiz/${item._id}`}>
+                    <Link href={`/product/${item._id}`}>
                       <img
                         className="w-full h-full object-cover rounded-t-lg hover:scale-105 transition-transform duration-300 ease-in-out"
                         src={item.image}
@@ -49,7 +49,7 @@ function page() {
                   </div>
                   <div className="grid gap-2 p-2">
                     <div className="grid">
-                      <Link href={`/quiz/${item._id}`}>
+                      <Link href={`/product/${item._id}`}>
                         <h3 className="text-base md:text-lg font-semibold line-clamp-1 hover:underline">
                           {item.name}
                         </h3>
