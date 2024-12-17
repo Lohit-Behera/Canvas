@@ -4,7 +4,6 @@ import { useLayoutEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
 import { fetchGetBlog } from "@/lib/features/blogSlice";
-import Image from "next/image";
 
 function page({ params }: { params: { slug: string } }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -24,7 +23,7 @@ function page({ params }: { params: { slug: string } }) {
         <p>Error</p>
       ) : getBlogStatus === "succeeded" ? (
         <div className="w-full md:w-[95%] grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Image
+          <img
             src={getBlog.thumbnail}
             alt={getBlog.title}
             className="w-full rounded-md"

@@ -12,6 +12,12 @@ type Blog = {
   __v: number;
 };
 
+type AllBlog = {
+  _id: string;
+  title: string;
+  thumbnail: string;
+};
+
 export const fetchCreateBlog = createAsyncThunk(
   "blog/createBlog",
   async (
@@ -56,6 +62,22 @@ export const fetchGetBlog = createAsyncThunk(
   }
 );
 
+export const fetchGetAllBlogs = createAsyncThunk(
+  "blog/getAllBlogs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(`${baseUrl}/api/v1/blogs/get/all`);
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const blogSlice = createSlice({
   name: "blog",
   initialState: {
@@ -66,6 +88,10 @@ export const blogSlice = createSlice({
     getBlog: { data: {} as Blog },
     getBlogStatus: "idle",
     getBlogError: {},
+
+    getAllBlogs: { data: [] as AllBlog[] },
+    getAllBlogsStatus: "idle",
+    getAllBlogsError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -93,6 +119,19 @@ export const blogSlice = createSlice({
       .addCase(fetchGetBlog.rejected, (state, action) => {
         state.getBlogStatus = "failed";
         state.getBlogError = action.payload || "Failed to get blog";
+      })
+
+      // Get All Blogs
+      .addCase(fetchGetAllBlogs.pending, (state) => {
+        state.getAllBlogsStatus = "loading";
+      })
+      .addCase(fetchGetAllBlogs.fulfilled, (state, action) => {
+        state.getAllBlogsStatus = "succeeded";
+        state.getAllBlogs = action.payload;
+      })
+      .addCase(fetchGetAllBlogs.rejected, (state, action) => {
+        state.getAllBlogsStatus = "failed";
+        state.getAllBlogsError = action.payload || "Failed to get all blogs";
       });
   },
 });

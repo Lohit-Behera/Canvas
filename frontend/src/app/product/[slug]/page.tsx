@@ -5,7 +5,6 @@ import { AppDispatch, RootState } from "@/lib/store";
 import { fetchGetProduct } from "@/lib/features/ProductSlice";
 import { useLayoutEffect } from "react";
 import { Button } from "@/components/ui/button";
-import Image from "next/image";
 
 function page({ params }: { params: { slug: string } }) {
   const dispatch = useDispatch<AppDispatch>();
@@ -28,7 +27,7 @@ function page({ params }: { params: { slug: string } }) {
         <div>Server Error</div>
       ) : getProductStatus === "succeeded" ? (
         <div className="w-full md:w-[95%] grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Image
+          <img
             src={getProduct.image}
             alt={getProduct.name}
             className="rounded-md"
