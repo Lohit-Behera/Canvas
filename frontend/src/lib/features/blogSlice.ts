@@ -2,6 +2,16 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../proxy";
 
+type Blog = {
+  _id: string;
+  title: string;
+  content: string;
+  thumbnail: string;
+  createdAt: string;
+  updatedAt: string;
+  __v: number;
+};
+
 export const fetchCreateBlog = createAsyncThunk(
   "blog/createBlog",
   async (
@@ -34,7 +44,7 @@ export const fetchGetBlog = createAsyncThunk(
   "blog/getBlog",
   async (blogId: string, { rejectWithValue }) => {
     try {
-      const { data } = await axios.get(`${baseUrl}/api/v1/blogs/get/${blogId}`);
+      const { data } = await axios.get(`${baseUrl}/api/v1/blogs/${blogId}`);
       return data;
     } catch (error: any) {
       const errorMessage =
@@ -53,7 +63,7 @@ export const blogSlice = createSlice({
     createBlogStatus: "idle",
     createBlogError: {},
 
-    getBlog: { data: {} },
+    getBlog: { data: {} as Blog },
     getBlogStatus: "idle",
     getBlogError: {},
   },
@@ -78,7 +88,11 @@ export const blogSlice = createSlice({
       })
       .addCase(fetchGetBlog.fulfilled, (state, action) => {
         state.getBlogStatus = "succeeded";
-        state.getBlog.data = action.payload;
+        state.getBlog = action.payload;
+      })
+      .addCase(fetchGetBlog.rejected, (state, action) => {
+        state.getBlogStatus = "failed";
+        state.getBlogError = action.payload || "Failed to get blog";
       });
   },
 });

@@ -6,6 +6,7 @@ import { fetchGetAllProducts } from "@/lib/features/ProductSlice";
 import { useLayoutEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import Image from "next/image";
 
 function page() {
   const dispatch = useDispatch<AppDispatch>();
@@ -40,7 +41,7 @@ function page() {
                 >
                   <div className="w-full h-44 overflow-hidden">
                     <Link href={`/product/${item._id}`}>
-                      <img
+                      <Image
                         className="w-full h-full object-cover rounded-t-lg hover:scale-105 transition-transform duration-300 ease-in-out"
                         src={item.image}
                         alt={item.name}
