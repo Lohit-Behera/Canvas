@@ -87,7 +87,9 @@ const getBlog = asyncHandler(async (req, res) => {
 // get all blogs
 const getAllBlogs = asyncHandler(async (req, res) => {
   // get all blogs
-  const blogs = await Blog.find();
+  const blogs = await Blog.find()
+    .sort({ createdAt: -1 })
+    .select("_id title thumbnail");
   // validate the blogs
   if (!blogs) {
     return res.status(404).json(new ApiResponse(404, null, "Blogs not found"));
@@ -98,4 +100,21 @@ const getAllBlogs = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, blogs, "Blogs found successfully"));
 });
 
-export { createBlog, getBlog, getAllBlogs };
+// get recent 4 blogs
+const getRecentBlogs = asyncHandler(async (req, res) => {
+  // get all blogs
+  const blogs = await Blog.find()
+    .sort({ createdAt: -1 })
+    .limit(4)
+    .select("_id title thumbnail");
+  // validate the blogs
+  if (!blogs) {
+    return res.status(404).json(new ApiResponse(404, null, "Blogs not found"));
+  }
+  // send the response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, blogs, "Blogs found successfully"));
+});
+
+export { createBlog, getBlog, getAllBlogs, getRecentBlogs };

@@ -5,6 +5,7 @@ import {
   createProduct,
   getProduct,
   getAllProducts,
+  getRecentProducts,
 } from "../controllers/productController";
 
 const productRouter = Router();
@@ -17,5 +18,6 @@ productRouter.post(
 );
 productRouter.get("/:productId", getProduct);
 productRouter.get("/get/all", getAllProducts);
+productRouter.get("/get/recent", getRecentProducts);
 
 export default productRouter;

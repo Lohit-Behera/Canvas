@@ -96,6 +96,22 @@ export const fetchGetAllProducts = createAsyncThunk(
   }
 );
 
+export const fetchGetRecentProducts = createAsyncThunk(
+  "product/getRecentProducts",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(`${baseUrl}/api/v1/products/get/recent`);
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 // slice
 const productSlice = createSlice({
   name: "product",
@@ -111,6 +127,10 @@ const productSlice = createSlice({
     getAllProducts: { data: [] as AllProducts[] },
     getAllProductsStatus: "idle",
     getAllProductsError: {},
+
+    getRecentProducts: { data: [] as AllProducts[] },
+    getRecentProductsStatus: "idle",
+    getRecentProductsError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -152,6 +172,20 @@ const productSlice = createSlice({
       .addCase(fetchGetAllProducts.rejected, (state, action) => {
         state.getAllProductsStatus = "failed";
         state.getAllProductsError = action.payload || "Failed to get products";
+      })
+
+      // Get Recent Products
+      .addCase(fetchGetRecentProducts.pending, (state) => {
+        state.getRecentProductsStatus = "loading";
+      })
+      .addCase(fetchGetRecentProducts.fulfilled, (state, action) => {
+        state.getRecentProductsStatus = "succeeded";
+        state.getRecentProducts = action.payload;
+      })
+      .addCase(fetchGetRecentProducts.rejected, (state, action) => {
+        state.getRecentProductsStatus = "failed";
+        state.getRecentProductsError =
+          action.payload || "Failed to get recent products";
       });
   },
 });

@@ -78,6 +78,22 @@ export const fetchGetAllBlogs = createAsyncThunk(
   }
 );
 
+export const fetchGetRecentBlogs = createAsyncThunk(
+  "blog/getRecentBlogs",
+  async (_, { rejectWithValue }) => {
+    try {
+      const { data } = await axios.get(`${baseUrl}/api/v1/blogs/get/recent`);
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const blogSlice = createSlice({
   name: "blog",
   initialState: {
@@ -92,6 +108,10 @@ export const blogSlice = createSlice({
     getAllBlogs: { data: [] as AllBlog[] },
     getAllBlogsStatus: "idle",
     getAllBlogsError: {},
+
+    getRecentBlogs: { data: [] as AllBlog[] },
+    getRecentBlogsStatus: "idle",
+    getRecentBlogsError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -132,6 +152,20 @@ export const blogSlice = createSlice({
       .addCase(fetchGetAllBlogs.rejected, (state, action) => {
         state.getAllBlogsStatus = "failed";
         state.getAllBlogsError = action.payload || "Failed to get all blogs";
+      })
+
+      // Get Recent Blogs
+      .addCase(fetchGetRecentBlogs.pending, (state) => {
+        state.getRecentBlogsStatus = "loading";
+      })
+      .addCase(fetchGetRecentBlogs.fulfilled, (state, action) => {
+        state.getRecentBlogsStatus = "succeeded";
+        state.getRecentBlogs = action.payload;
+      })
+      .addCase(fetchGetRecentBlogs.rejected, (state, action) => {
+        state.getRecentBlogsStatus = "failed";
+        state.getRecentBlogsError =
+          action.payload || "Failed to get recent blogs";
       });
   },
 });

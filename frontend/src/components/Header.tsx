@@ -29,11 +29,11 @@ function Header() {
             Create Product
           </Button>
           <Button
-            variant={pathname === "/product" ? "default" : "outline"}
+            variant={pathname === "/create-blog" ? "default" : "outline"}
             size="sm"
-            onClick={() => router.push("/product")}
+            onClick={() => router.push("/create-blog")}
           >
-            Products
+            Create Blog
           </Button>
           <ModeToggle />
         </div>
