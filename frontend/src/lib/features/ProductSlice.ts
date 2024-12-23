@@ -5,12 +5,15 @@ import { baseUrl } from "../proxy";
 // types
 type CreateProduct = {
   name: string;
-  description: string;
+  productDescription?: string;
+  productDetail: string;
   affiliateLink: string;
-  price: number;
+  amount: number;
+  discount: number;
+  sellingPrice: number;
   category: string;
   quantity: number;
-  image: File;
+  thumbnail: File;
 };
 
 type Product = {

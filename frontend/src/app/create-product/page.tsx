@@ -44,11 +44,12 @@ const createProductSchema = z.object({
   affiliateLink: z
     .string()
     .url({ message: "Affiliate link must be a valid URL" }),
-  description: z
+  productDescription: z.string().optional(),
+  productDetail: z
     .string()
-    .min(10, { message: "Description must be at least 10 characters" })
+    .min(1, { message: "Description must be at least 10 characters" })
     .max(500, { message: "Description must be at most 500 characters" }),
-  image: z
+  thumbnail: z
     .any()
     .refine((file) => file instanceof File, {
       message: "Thumbnail is required.",
@@ -59,10 +60,18 @@ const createProductSchema = z.object({
     .refine((file) => ["image/jpeg", "image/png"].includes(file?.type), {
       message: "Only .jpg and .png formats are supported.",
     }),
-  price: z
+  amount: z
     .number()
     .positive({ message: "Amount must be a positive number" })
     .min(1, { message: "Amount must be at least 1" }),
+  discount: z
+    .number()
+    .positive({ message: "Discount must be a positive number" })
+    .min(1, { message: "Discount must be at least 1" }),
+  sellingPrice: z
+    .number()
+    .positive({ message: "Selling Price must be a positive number" })
+    .min(1, { message: "Selling Price must be at least 1" }),
   category: z.string({
     required_error: "Please select a category.",
   }),
@@ -89,12 +98,15 @@ function page() {
     resolver: zodResolver(createProductSchema),
     defaultValues: {
       name: "",
-      description: "",
+      productDescription: "",
+      productDetail: "",
       affiliateLink: "",
-      price: 0,
+      amount: 0,
+      discount: 0,
+      sellingPrice: 0,
       category: "",
       quantity: 0,
-      image: undefined,
+      thumbnail: undefined,
     },
   });
 
@@ -147,12 +159,25 @@ function page() {
                 />
                 <FormField
                   control={form.control}
-                  name="description"
+                  name="productDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Description</FormLabel>
+                      <FormLabel>Product Description</FormLabel>
                       <FormControl>
                         <Input placeholder="Product description" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="productDetail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Product Detail</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Product Detail" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -227,10 +252,10 @@ function page() {
                 />
                 <FormField
                   control={form.control}
-                  name="price"
+                  name="amount"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Price</FormLabel>
+                      <FormLabel>Amount</FormLabel>
                       <FormControl>
                         <Input
                           type="number"
@@ -251,17 +276,65 @@ function page() {
                 />
                 <FormField
                   control={form.control}
-                  name="image"
+                  name="sellingPrice"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Image</FormLabel>
+                      <FormLabel>Selling Price</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Selling Price"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="discount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Discount</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          placeholder="Discount"
+                          {...field}
+                          onChange={(e) =>
+                            field.onChange(
+                              e.target.value
+                                ? Number(e.target.value)
+                                : undefined
+                            )
+                          }
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="thumbnail"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Thumbnail</FormLabel>
                       <FormControl>
                         <Input
                           type="file"
                           onChange={(e) =>
                             field.onChange(e.target.files?.[0] || null)
                           }
-                          placeholder="Image"
+                          placeholder="Thumbnail"
                         />
                       </FormControl>
                       <FormMessage />

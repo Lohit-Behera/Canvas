@@ -12,7 +12,7 @@ const productRouter = Router();
 
 productRouter.post(
   "/create",
-  upload.single("image"),
+  upload.single("thumbnail"),
   resizeImage,
   createProduct
 );

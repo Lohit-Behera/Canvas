@@ -7,7 +7,10 @@ const productSchema = new Schema(
       type: String,
       required: true,
     },
-    description: {
+    productDescription: {
+      type: String,
+    },
+    productDetail: {
       type: String,
       required: true,
     },
@@ -15,20 +18,30 @@ const productSchema = new Schema(
       type: String,
       required: true,
     },
-    price: {
+    category: {
+      type: String,
+      required: true,
+    },
+    thumbnail: {
+      type: String,
+      required: true,
+    },
+    images: {
+      type: [String],
+    },
+    quantity: {
       type: Number,
       required: true,
     },
-    category: {
-      type: String,
-      enum: ["Electronics", "Clothing", "Books", "Home Appliances", "Toys"],
+    amount: {
+      type: Number,
       required: true,
     },
-    image: {
-      type: String,
+    discount: {
+      type: Number,
       required: true,
     },
-    quantity: {
+    sellingPrice: {
       type: Number,
       required: true,
     },

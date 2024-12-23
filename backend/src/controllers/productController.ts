@@ -2,78 +2,63 @@ import { Product } from "../model/productModel";
 import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
 import { uploadFile } from "../utils/cloudinary";
+import Joi from "joi";
 
 const createProduct = asyncHandler(async (req, res) => {
-  // get the data from the request
-  const { name, description, affiliateLink, price, category, quantity } =
-    req.body;
+  // Joi schema for validation
+  const schema = Joi.object({
+    name: Joi.string().min(3).max(50).required(),
+    productDescription: Joi.string().allow(""),
+    productDetail: Joi.string().min(10).max(500).required(),
+    affiliateLink: Joi.string().uri().required(),
+    category: Joi.string().required(),
+    quantity: Joi.number().integer().positive().required(),
+    amount: Joi.number().positive().required(),
+    discount: Joi.number().min(0).max(100).required(),
+    sellingPrice: Joi.number().positive().required(),
+  });
 
-  // validate the data
-  // Validate required fields
-  if (
-    !name ||
-    !description ||
-    !affiliateLink ||
-    !price ||
-    !category ||
-    !quantity
-  ) {
+  // Validate request body
+  const { error, value } = schema.validate(req.body);
+  if (error) {
     return res
       .status(400)
-      .json(new ApiResponse(400, null, "All fields are required"));
+      .json(new ApiResponse(400, null, error.details[0].message));
   }
 
-  // Validate data types
-  if (
-    typeof name !== "string" ||
-    typeof description !== "string" ||
-    typeof affiliateLink !== "string"
-  ) {
-    return res
-      .status(400)
-      .json(
-        new ApiResponse(
-          400,
-          null,
-          "Invalid type for name, description, or affiliateLink"
-        )
-      );
-  }
+  // Extract validated fields
+  const {
+    name,
+    productDescription,
+    productDetail,
+    affiliateLink,
+    amount,
+    discount,
+    sellingPrice,
+    category,
+    quantity,
+  } = value;
 
-  if (Number.isNaN(Number(price)) || Number.isNaN(Number(quantity))) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, null, "Price and quantity must be numbers"));
-  }
-
-  // Validate category
-  const validCategories = [
-    "Electronics",
-    "Clothing",
-    "Books",
-    "Home Appliances",
-    "Toys",
-  ];
-  if (!validCategories.includes(category)) {
-    return res.status(400).json(new ApiResponse(400, null, "Invalid category"));
-  }
-  // get image from the request
-  const image = req.file;
+  // get thumbnail from the request
+  const thumbnail = req.file;
   // validate the image
-  if (!image) {
+  if (!thumbnail) {
     return res
       .status(400)
       .json(new ApiResponse(400, null, "Image is required"));
   }
-  if (image.mimetype !== "image/jpeg" && image.mimetype !== "image/png") {
+  if (
+    thumbnail.mimetype !== "image/jpeg" &&
+    thumbnail.mimetype !== "image/png"
+  ) {
     return res
       .status(400)
       .json(new ApiResponse(400, null, "Invalid image format"));
   }
   // upload image to cloudinary
-  const imageUrl = await uploadFile(image);
+  const thumbnailUrl = await uploadFile(thumbnail);
   // validate the image url
-  if (!imageUrl) {
+  if (!thumbnailUrl) {
     return res
       .status(500)
       .json(new ApiResponse(500, null, "Image upload failed"));
@@ -81,12 +66,15 @@ const createProduct = asyncHandler(async (req, res) => {
   // create the product
   const product = await Product.create({
     name,
-    description,
+    productDescription,
+    productDetail,
     affiliateLink,
-    price: Number(price),
+    amount,
+    discount,
+    sellingPrice,
     category,
-    quantity: Number(quantity),
-    image: imageUrl,
+    quantity,
+    thumbnail: thumbnailUrl,
   });
   // validate the product creation
   const createdProduct = await Product.findById(product._id);
