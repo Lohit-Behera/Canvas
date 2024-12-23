@@ -17,18 +17,16 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
-import { fetchCreateBlog } from "@/lib/features/blogSlice";
+import { fetchCreateCategory } from "@/lib/features/categorySlice";
 
-const createBlogSchema = z.object({
-  title: z
+const createCategorySchema = z.object({
+  name: z
     .string()
-    .min(3, { message: "Title must be at least 3 characters" })
-    .max(50, { message: "Title must be at most 50 characters" }),
-  content: z
-    .string()
-    .min(10, { message: "Content must be at least 10 characters" })
-    .max(500, { message: "Content must be at most 500 characters" }),
+    .min(3, { message: "Name must be at least 3 characters" })
+    .max(50, { message: "Name must be at most 50 characters" }),
+  isPublic: z.boolean(),
   thumbnail: z
     .any()
     .refine((file) => file instanceof File, {
@@ -46,62 +44,51 @@ function page() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
-  const form = useForm<z.infer<typeof createBlogSchema>>({
-    resolver: zodResolver(createBlogSchema),
+  const form = useForm<z.infer<typeof createCategorySchema>>({
+    resolver: zodResolver(createCategorySchema),
     defaultValues: {
-      title: "",
-      content: "",
+      name: "",
+      isPublic: true,
       thumbnail: undefined,
     },
   });
-  function onSubmit(values: z.infer<typeof createBlogSchema>) {
-    const createBlogPromise = dispatch(fetchCreateBlog(values)).unwrap();
-    toast.promise(createBlogPromise, {
-      loading: "Creating blog...",
+
+  const onSubmit = async (values: z.infer<typeof createCategorySchema>) => {
+    const createCategoryPromise = dispatch(
+      fetchCreateCategory(values)
+    ).unwrap();
+    toast.promise(createCategoryPromise, {
+      loading: "Creating category...",
       success: (data) => {
-        router.push(`/blog/${data.data}`);
-        return data.message || "Blog created successfully";
+        router.push(`/category/${data.data}`);
+        return data.message || "Category created successfully";
       },
       error: (error) => {
         return (
           error ||
-          error.data.massage ||
-          error.message ||
-          "Failed to create blog. Please try again later."
+          error.massage ||
+          error.data.message ||
+          "Failed to create category. Please try again later."
         );
       },
     });
-  }
-
+  };
   return (
     <Card className="w-full md:w-[95%] lg:w-[90%]">
       <CardHeader>
-        <CardTitle>Create Blog</CardTitle>
+        <CardTitle>Create Category</CardTitle>
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
               control={form.control}
-              name="title"
+              name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Title</FormLabel>
+                  <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="Enter title" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Content</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Enter content" {...field} />
+                    <Input placeholder="Enter name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -113,7 +100,7 @@ function page() {
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Thumbnail</FormLabel>
-                  <FormControl>
+                  <FormControl className="cursor-pointer">
                     <Input
                       type="file"
                       onChange={(e) =>
@@ -126,7 +113,26 @@ function page() {
                 </FormItem>
               )}
             />
-            <Button type="submit" size="sm" className="w-full">
+            <FormField
+              control={form.control}
+              name="isPublic"
+              render={({ field }) => (
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0 ">
+                  <FormControl>
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
+                  </FormControl>
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>Is Public</FormLabel>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <Button className="w-full" type="submit">
               Submit
             </Button>
           </form>

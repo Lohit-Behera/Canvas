@@ -10,6 +10,7 @@ import {
   SheetHeader,
   SheetTitle,
   SheetTrigger,
+  SheetClose,
 } from "@/components/ui/sheet";
 import { ChevronDown, PanelLeft } from "lucide-react";
 import {
@@ -27,6 +28,44 @@ const ModeToggle = dynamic(
 function Header() {
   const router = useRouter();
   const pathname = usePathname();
+
+  const data = [
+    {
+      name: "Product",
+      sub: [
+        {
+          name: "All Product",
+          link: "/",
+        },
+        {
+          name: "Create Product",
+          link: "/create-product",
+        },
+      ],
+    },
+    {
+      name: "Blog",
+      sub: [
+        {
+          name: "All Blog",
+          link: "/blog",
+        },
+        {
+          name: "Create Blog",
+          link: "/create-blog",
+        },
+      ],
+    },
+    {
+      name: "Settings",
+      sub: [
+        {
+          name: "Add Category",
+          link: "/create-category",
+        },
+      ],
+    },
+  ];
   return (
     <header className="z-20 w-full sticky top-0 p-2 backdrop-blur bg-background">
       <nav className="flex justify-between space-x-2">
@@ -45,84 +84,42 @@ function Header() {
                 <Link href={"/"}>Logo</Link>
               </SheetTitle>
             </SheetHeader>
-            <Collapsible>
-              <CollapsibleTrigger
-                asChild
-                className="[&[data-state=open]>svg]:rotate-180"
-              >
-                <Button
-                  className="w-full flex justify-between"
-                  variant={"outline"}
-                  size="sm"
+            {data.map((item, index) => (
+              <Collapsible key={index}>
+                <CollapsibleTrigger
+                  asChild
+                  className="[&[data-state=open]>svg]:rotate-180"
                 >
-                  Product
-                  <ChevronDown />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="flex justify-between my-2">
-                <span className="w-[1px] bg-muted-foreground/50 ml-2" />
-                <div className="w-[90%] flex flex-col justify-end space-y-2">
                   <Button
-                    className="w-full flex justify-start"
-                    variant={
-                      pathname === "/create-product" ? "default" : "outline"
-                    }
+                    className="w-full flex justify-between"
+                    variant={"outline"}
                     size="sm"
-                    onClick={() => router.push("/create-product")}
                   >
-                    All Product
+                    {item.name}
+                    <ChevronDown />
                   </Button>
-                  <Button
-                    className="w-full flex justify-start"
-                    variant={pathname === "/product" ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => router.push("/create-product")}
-                  >
-                    Add Product
-                  </Button>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
-            <Collapsible>
-              <CollapsibleTrigger
-                asChild
-                className="[&[data-state=open]>svg]:rotate-180"
-              >
-                <Button
-                  className="w-full flex justify-between"
-                  variant={"outline"}
-                  size="sm"
-                >
-                  Blog
-                  <ChevronDown />
-                </Button>
-              </CollapsibleTrigger>
-              <CollapsibleContent className="flex justify-between my-2">
-                <span className="w-[1px] bg-muted-foreground/50 ml-2" />
-                <div className="w-[90%] flex flex-col justify-end space-y-2">
-                  <Button
-                    className="w-full flex justify-start"
-                    variant={
-                      pathname === "/create-product" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => router.push("/create-product")}
-                  >
-                    All Product
-                  </Button>
-                  <Button
-                    className="flex justify-start"
-                    variant={
-                      pathname === "/create-blog" ? "default" : "outline"
-                    }
-                    size="sm"
-                    onClick={() => router.push("/create-blog")}
-                  >
-                    Add Blog
-                  </Button>
-                </div>
-              </CollapsibleContent>
-            </Collapsible>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="flex justify-between my-2">
+                  <span className="w-[1px] bg-muted-foreground/50 ml-2" />
+                  <div className="w-[90%] flex flex-col justify-end space-y-2">
+                    {item.sub.map((sub, index) => (
+                      <SheetClose asChild key={index}>
+                        <Button
+                          className="w-full flex justify-start"
+                          variant={
+                            pathname === sub.link ? "default" : "outline"
+                          }
+                          size="sm"
+                          onClick={() => router.push(sub.link)}
+                        >
+                          {sub.name}
+                        </Button>
+                      </SheetClose>
+                    ))}
+                  </div>
+                </CollapsibleContent>
+              </Collapsible>
+            ))}
           </SheetContent>
         </Sheet>
         <ModeToggle />
