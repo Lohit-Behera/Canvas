@@ -111,7 +111,7 @@ const categorySlice = createSlice({
     getAllCategoriesStatus: "idle",
     getAllCategoriesError: {},
 
-    getAllCategoriesNames: {},
+    getAllCategoriesNames: { data: [] as { name: string; _id: string }[] },
     getAllCategoriesNamesStatus: "idle",
     getAllCategoriesNamesError: {},
   },
