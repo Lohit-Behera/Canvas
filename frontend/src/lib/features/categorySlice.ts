@@ -2,6 +2,27 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { baseUrl } from "../proxy";
 
+// types
+type Category = {
+  _id: string;
+  name: string;
+  thumbnail: string;
+  isPublic: boolean;
+};
+
+type AllCategories = {
+  docs: Category[];
+  totalDocs: number;
+  limit: number;
+  page: number;
+  totalPages: number;
+  pagingCounter: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  prevPage: number | null;
+  nextPage: number | null;
+};
+
 // api call
 export const fetchCreateCategory = createAsyncThunk(
   "category/createCategory",
@@ -31,7 +52,7 @@ export const fetchCreateCategory = createAsyncThunk(
   }
 );
 
-export const getAllCategories = createAsyncThunk(
+export const fetchGetAllCategories = createAsyncThunk(
   "category/getAllCategories",
   async (_, { rejectWithValue }) => {
     try {
@@ -55,7 +76,7 @@ export const getAllCategories = createAsyncThunk(
   }
 );
 
-export const getAllCategoriesNames = createAsyncThunk(
+export const fetchGetAllCategoriesNames = createAsyncThunk(
   "category/getAllCategoriesNames",
   async (_, { rejectWithValue }) => {
     try {
@@ -86,7 +107,7 @@ const categorySlice = createSlice({
     createCategoryStatus: "idle",
     createCategoryError: {},
 
-    getAllCategories: {},
+    getAllCategories: { data: {} as AllCategories },
     getAllCategoriesStatus: "idle",
     getAllCategoriesError: {},
 
@@ -111,28 +132,28 @@ const categorySlice = createSlice({
           action.payload || "Failed to create category";
       })
       // get all categories
-      .addCase(getAllCategories.pending, (state) => {
+      .addCase(fetchGetAllCategories.pending, (state) => {
         state.getAllCategoriesStatus = "loading";
       })
-      .addCase(getAllCategories.fulfilled, (state, action) => {
+      .addCase(fetchGetAllCategories.fulfilled, (state, action) => {
         state.getAllCategoriesStatus = "succeeded";
         state.getAllCategories = action.payload;
       })
-      .addCase(getAllCategories.rejected, (state, action) => {
+      .addCase(fetchGetAllCategories.rejected, (state, action) => {
         state.getAllCategoriesStatus = "failed";
         state.getAllCategoriesError =
           action.payload || "Failed to get categories";
       })
 
       // get all categories names
-      .addCase(getAllCategoriesNames.pending, (state) => {
+      .addCase(fetchGetAllCategoriesNames.pending, (state) => {
         state.getAllCategoriesNamesStatus = "loading";
       })
-      .addCase(getAllCategoriesNames.fulfilled, (state, action) => {
+      .addCase(fetchGetAllCategoriesNames.fulfilled, (state, action) => {
         state.getAllCategoriesNamesStatus = "succeeded";
         state.getAllCategoriesNames = action.payload;
       })
-      .addCase(getAllCategoriesNames.rejected, (state, action) => {
+      .addCase(fetchGetAllCategoriesNames.rejected, (state, action) => {
         state.getAllCategoriesNamesStatus = "failed";
         state.getAllCategoriesNamesError =
           action.payload || "Failed to get categories names";

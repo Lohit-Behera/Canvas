@@ -1,12 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit";
 import ProductSlice from "./features/ProductSlice";
 import blogSlice from "./features/blogSlice";
+import categorySlice from "./features/categorySlice";
 
 export const makeStore = () => {
   return configureStore({
     reducer: {
       product: ProductSlice,
       blog: blogSlice,
+      category: categorySlice,
     },
   });
 };

@@ -59,20 +59,36 @@ const createCategory = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, createdCategory._id, "Category created successfully")
+      new ApiResponse(200, createdCategory, "Category created successfully")
     );
 });
 
 const getAllCategories = asyncHandler(async (req, res) => {
-  // get all categories
-  const categories = await Category.find();
-  // validate the categories
-  if (!categories) {
+  const { page = 1, limit = 10, sort = "asc" } = req.query; // Extract query params
+
+  // Build the aggregation pipeline
+  const aggregate = Category.aggregate([
+    { $match: { isPublic: true } },
+    { $sort: { name: sort === "asc" ? 1 : -1 } },
+    { $project: { name: 1, thumbnail: 1, isPublic: 1, _id: 1 } },
+  ]);
+
+  // Apply pagination using the plugin
+  const options = {
+    page: parseInt(page.toString(), 10),
+    limit: parseInt(limit.toString(), 10),
+  };
+
+  const categories = await Category.aggregatePaginate(aggregate, options);
+
+  // Validate the categories
+  if (!categories || categories.docs.length === 0) {
     return res
       .status(404)
       .json(new ApiResponse(404, null, "Categories not found"));
   }
-  // send the response
+
+  // Send the response
   return res
     .status(200)
     .json(new ApiResponse(200, categories, "Categories found successfully"));
@@ -80,7 +96,7 @@ const getAllCategories = asyncHandler(async (req, res) => {
 
 const getAllCategoriesNames = asyncHandler(async (req, res) => {
   // get all categories
-  const categories = await Category.find().select("name");
+  const categories = await Category.find().select("name").sort({ name: 1 });
   // validate the categories
   if (!categories) {
     return res
