@@ -7,14 +7,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -32,6 +25,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
+import RichTextEditor from "@/components/TextEditor";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { fetchGetAllCategoriesNames } from "@/lib/features/categorySlice";
@@ -47,8 +43,8 @@ const createProductSchema = z.object({
   productDescription: z.string().optional(),
   productDetail: z
     .string()
-    .min(1, { message: "Description must be at least 10 characters" })
-    .max(500, { message: "Description must be at most 500 characters" }),
+    .min(10, { message: "Description must be at least 10 characters" })
+    .max(1000, { message: "Description must be at most 1000 characters" }),
   thumbnail: z
     .any()
     .refine((file) => file instanceof File, {
@@ -76,9 +72,10 @@ const createProductSchema = z.object({
     required_error: "Please select a category.",
   }),
   quantity: z.number().positive({ message: "Price must be a positive number" }),
+  isPublic: z.boolean(),
 });
 
-function page() {
+function AddProduct() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const getAllCategoriesNames = useSelector(
@@ -101,12 +98,13 @@ function page() {
       productDescription: "",
       productDetail: "",
       affiliateLink: "",
-      amount: 0,
-      discount: 0,
-      sellingPrice: 0,
+      amount: undefined,
+      discount: undefined,
+      sellingPrice: undefined,
       category: "",
-      quantity: 0,
+      quantity: undefined,
       thumbnail: undefined,
+      isPublic: true,
     },
   });
 
@@ -149,7 +147,7 @@ function page() {
                   name="name"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Name</FormLabel>
+                      <FormLabel>Product Name</FormLabel>
                       <FormControl>
                         <Input placeholder="Product name" {...field} />
                       </FormControl>
@@ -157,32 +155,109 @@ function page() {
                     </FormItem>
                   )}
                 />
-                <FormField
-                  control={form.control}
-                  name="productDescription"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Description</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Product description" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="productDetail"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Product Detail</FormLabel>
-                      <FormControl>
-                        <Input placeholder="Product Detail" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <FormField
+                    control={form.control}
+                    name="quantity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Quantity</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="Quantity"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="amount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Amount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="Amount"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="sellingPrice"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Selling Price</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="Selling Price"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="discount"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Discount</FormLabel>
+                        <FormControl>
+                          <Input
+                            type="number"
+                            className="[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                            placeholder="Discount"
+                            {...field}
+                            onChange={(e) =>
+                              field.onChange(
+                                e.target.value
+                                  ? Number(e.target.value)
+                                  : undefined
+                              )
+                            }
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
                 <FormField
                   control={form.control}
                   name="affiliateLink"
@@ -228,102 +303,6 @@ function page() {
                 />
                 <FormField
                   control={form.control}
-                  name="quantity"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Quantity</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Quantity"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Amount</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="price"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="sellingPrice"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Selling Price</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Selling Price"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="discount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Discount</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="number"
-                          placeholder="Discount"
-                          {...field}
-                          onChange={(e) =>
-                            field.onChange(
-                              e.target.value
-                                ? Number(e.target.value)
-                                : undefined
-                            )
-                          }
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
                   name="thumbnail"
                   render={({ field }) => (
                     <FormItem>
@@ -341,19 +320,77 @@ function page() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="isPublic"
+                  render={({ field }) => (
+                    <FormItem className="flex flex-row items-start space-x-3 space-y-0">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
+                      <div className="space-y-1 leading-none">
+                        <FormLabel>Product Public</FormLabel>
+                      </div>
+                    </FormItem>
+                  )}
+                />
+                <Tabs defaultValue="details" className="w-full">
+                  <TabsList>
+                    <TabsTrigger value="details">Product Details</TabsTrigger>
+                    <TabsTrigger value="description">
+                      Product Description
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="details">
+                    <FormField
+                      control={form.control}
+                      name="productDetail"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Product Detail</FormLabel>
+                          <FormControl>
+                            <RichTextEditor
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TabsContent>
+                  <TabsContent value="description">
+                    <FormField
+                      control={form.control}
+                      name="productDescription"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Product Description</FormLabel>
+                          <FormControl>
+                            <RichTextEditor
+                              {...field}
+                              value={field.value || ""}
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </TabsContent>
+                </Tabs>
                 <Button type="submit" size="sm" className="w-full">
                   Submit
                 </Button>
               </form>
             </Form>
           </CardContent>
-          <CardFooter>
-            <p>Card Footer</p>
-          </CardFooter>
         </Card>
       ) : null}
     </>
   );
 }
 
-export default page;
+export default AddProduct;

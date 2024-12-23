@@ -9,13 +9,14 @@ const createProduct = asyncHandler(async (req, res) => {
   const schema = Joi.object({
     name: Joi.string().min(3).max(50).required(),
     productDescription: Joi.string().allow(""),
-    productDetail: Joi.string().min(10).max(500).required(),
+    productDetail: Joi.string().min(10).max(1000).required(),
     affiliateLink: Joi.string().uri().required(),
     category: Joi.string().required(),
     quantity: Joi.number().integer().positive().required(),
     amount: Joi.number().positive().required(),
     discount: Joi.number().min(0).max(100).required(),
     sellingPrice: Joi.number().positive().required(),
+    isPublic: Joi.boolean().required(),
   });
 
   // Validate request body
@@ -37,6 +38,7 @@ const createProduct = asyncHandler(async (req, res) => {
     sellingPrice,
     category,
     quantity,
+    isPublic,
   } = value;
 
   // get thumbnail from the request
@@ -75,6 +77,7 @@ const createProduct = asyncHandler(async (req, res) => {
     category,
     quantity,
     thumbnail: thumbnailUrl,
+    isPublic,
   });
   // validate the product creation
   const createdProduct = await Product.findById(product._id);

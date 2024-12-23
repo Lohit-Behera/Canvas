@@ -45,6 +45,10 @@ const productSchema = new Schema(
       type: Number,
       required: true,
     },
+    isPublic: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
