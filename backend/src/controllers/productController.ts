@@ -7,9 +7,9 @@ import Joi from "joi";
 const createProduct = asyncHandler(async (req, res) => {
   // Joi schema for validation
   const schema = Joi.object({
-    name: Joi.string().min(3).max(50).required(),
+    name: Joi.string().min(3).max(500).required(),
     productDescription: Joi.string().allow(""),
-    productDetail: Joi.string().min(10).max(1000).required(),
+    productDetail: Joi.string().min(10).max(2000).required(),
     affiliateLink: Joi.string().uri().required(),
     category: Joi.string().required(),
     quantity: Joi.number().integer().positive().required(),
@@ -112,18 +112,34 @@ const getProduct = asyncHandler(async (req, res) => {
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
-  // get all products
-  const products = await Product.find()
-    .sort({ createdAt: -1 })
-    .select("_id name affiliateLink price category image");
+  // Build the aggregation pipeline
+  const products = await Product.aggregate([
+    {
+      $sort: {
+        createdAt: -1,
+      },
+    },
+    {
+      $project: {
+        name: 1,
+        category: 1,
+        thumbnail: 1,
+        amount: 1,
+        discount: 1,
+        sellingPrice: 1,
+        isPublic: 1,
+      },
+    },
+  ]);
 
-  // validate the products
-  if (!products) {
+  // Validate the products
+  if (!products || products.length === 0) {
     return res
       .status(404)
       .json(new ApiResponse(404, null, "Products not found"));
   }
-  // send the response
+
+  // Send the response
   return res
     .status(200)
     .json(new ApiResponse(200, products, "Products found successfully"));

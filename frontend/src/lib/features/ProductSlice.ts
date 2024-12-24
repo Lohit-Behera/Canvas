@@ -30,13 +30,28 @@ type Product = {
   __v: number;
 };
 
-type AllProducts = {
+export type AllProductType = {
   _id: string;
   name: string;
-  affiliateLink: string;
-  price: number;
-  image: string;
   category: string;
+  thumbnail: string;
+  amount: string;
+  discount: string;
+  sellingPrice: string;
+  isPublic: string;
+};
+
+type AllProducts = {
+  docs: AllProductType[];
+  totalDocs: number;
+  limit: number;
+  totalPages: number;
+  page: number;
+  pagingCounter: number;
+  hasPrevPage: boolean;
+  hasNextPage: boolean;
+  prevPage: number;
+  nextPage: number;
 };
 
 // fetch functions
@@ -127,11 +142,11 @@ const productSlice = createSlice({
     getProductStatus: "idle",
     getProductError: {},
 
-    getAllProducts: { data: [] as AllProducts[] },
+    getAllProducts: { data: [] as AllProductType[] },
     getAllProductsStatus: "idle",
     getAllProductsError: {},
 
-    getRecentProducts: { data: [] as AllProducts[] },
+    getRecentProducts: { data: [] as AllProductType[] },
     getRecentProductsStatus: "idle",
     getRecentProductsError: {},
   },

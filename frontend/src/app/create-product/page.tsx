@@ -36,7 +36,7 @@ const createProductSchema = z.object({
   name: z
     .string()
     .min(3, { message: "Name must be at least 3 characters" })
-    .max(50, { message: "Name must be at most 50 characters" }),
+    .max(500, { message: "Name must be at most 500 characters" }),
   affiliateLink: z
     .string()
     .url({ message: "Affiliate link must be a valid URL" }),
@@ -44,7 +44,7 @@ const createProductSchema = z.object({
   productDetail: z
     .string()
     .min(10, { message: "Description must be at least 10 characters" })
-    .max(1000, { message: "Description must be at most 1000 characters" }),
+    .max(2000, { message: "Description must be at most 2000 characters" }),
   thumbnail: z
     .any()
     .refine((file) => file instanceof File, {
