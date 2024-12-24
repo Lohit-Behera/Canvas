@@ -2,16 +2,23 @@ import { asyncHandler } from "../utils/asyncHandler";
 import { ApiResponse } from "../utils/ApiResponse";
 import { Category } from "../model/categoryModel";
 import { uploadFile } from "../utils/cloudinary";
+import Joi from "joi";
 
 const createCategory = asyncHandler(async (req, res) => {
-  // get the data from the request
-  const { name, isPublic } = req.body;
-  // validate the data
-  if (!name || !isPublic) {
+  // Joi schema for validation
+  const schema = Joi.object({
+    name: Joi.string().min(3).max(50).required(),
+    isPublic: Joi.boolean().required(),
+  });
+
+  // Validate request body
+  const { error, value } = schema.validate(req.body);
+  if (error) {
     return res
       .status(400)
-      .json(new ApiResponse(400, null, "All fields are required"));
+      .json(new ApiResponse(400, null, error.details[0].message));
   }
+  const { name, isPublic } = value;
   // check if category already exists
   const categoryExists = await Category.findOne({ name });
   if (categoryExists) {

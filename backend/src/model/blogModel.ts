@@ -15,6 +15,19 @@ const blogSchema = new Schema(
       type: String,
       required: true,
     },
+    seoTitle: {
+      type: String,
+    },
+    seoDescription: {
+      type: String,
+    },
+    seoKeywords: {
+      type: String,
+    },
+    isPublic: {
+      type: Boolean,
+      default: true,
+    },
   },
   { timestamps: true }
 );

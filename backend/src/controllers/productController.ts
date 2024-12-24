@@ -14,7 +14,7 @@ const createProduct = asyncHandler(async (req, res) => {
     category: Joi.string().required(),
     quantity: Joi.number().integer().positive().required(),
     amount: Joi.number().positive().required(),
-    discount: Joi.number().min(0).max(100).required(),
+    discount: Joi.number().required(),
     sellingPrice: Joi.number().positive().required(),
     isPublic: Joi.boolean().required(),
   });

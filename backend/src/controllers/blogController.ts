@@ -2,29 +2,28 @@ import { ApiResponse } from "../utils/ApiResponse";
 import { asyncHandler } from "../utils/asyncHandler";
 import { uploadFile } from "../utils/cloudinary";
 import { Blog } from "../model/blogModel";
+import Joi from "joi";
 
 // create a blog
 const createBlog = asyncHandler(async (req, res) => {
-  // get the data from the request
-  const { title, content } = req.body;
-  // validate the data
-  if (!title || !content) {
+  // Joi schema for validation
+  const schema = Joi.object({
+    title: Joi.string().min(3).max(50).required(),
+    content: Joi.string().required(),
+    isPublic: Joi.boolean().required(),
+    seoTitle: Joi.string().allow("").optional(),
+    seoDescription: Joi.string().allow("").optional(),
+    seoKeywords: Joi.string().allow("").optional(),
+  });
+  // Validate request body
+  const { error, value } = schema.validate(req.body);
+  if (error) {
     return res
       .status(400)
-      .json(new ApiResponse(400, null, "All fields are required"));
+      .json(new ApiResponse(400, null, error.details[0].message));
   }
-  if (title.length < 3) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, null, "Title must be at least 3 characters"));
-  }
-  if (content.length < 10) {
-    return res
-      .status(400)
-      .json(
-        new ApiResponse(400, null, "Content must be at least 10 characters")
-      );
-  }
+  const { title, content, isPublic, seoTitle, seoDescription, seoKeywords } =
+    value;
 
   // get thumbnail from the request
   const thumbnail = req.file;
@@ -54,6 +53,10 @@ const createBlog = asyncHandler(async (req, res) => {
     title,
     content,
     thumbnail: thumbnailUrl,
+    isPublic,
+    seoTitle,
+    seoDescription,
+    seoKeywords,
   });
   // validate the blog creation
   const createdBlog = await Blog.findById(blog._id);
