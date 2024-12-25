@@ -35,11 +35,11 @@ function Header() {
       sub: [
         {
           name: "All Product",
-          link: "/",
+          link: "/product",
         },
         {
-          name: "Create Product",
-          link: "/create-product",
+          name: "Add Product",
+          link: "/product/add",
         },
       ],
     },
@@ -51,17 +51,21 @@ function Header() {
           link: "/blog",
         },
         {
-          name: "Create Blog",
-          link: "/create-blog",
+          name: "Add Blog",
+          link: "/blog/add",
         },
       ],
     },
     {
-      name: "Settings",
+      name: "Category",
       sub: [
         {
+          name: "All Category",
+          link: "/category",
+        },
+        {
           name: "Add Category",
-          link: "/create-category",
+          link: "/category/add",
         },
       ],
     },

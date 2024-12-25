@@ -71,25 +71,23 @@ const createCategory = asyncHandler(async (req, res) => {
 });
 
 const getAllCategories = asyncHandler(async (req, res) => {
-  const { page = 1, limit = 10, sort = "asc" } = req.query; // Extract query params
-
-  // Build the aggregation pipeline
-  const aggregate = Category.aggregate([
-    { $match: { isPublic: true } },
-    { $sort: { name: sort === "asc" ? 1 : -1 } },
-    { $project: { name: 1, thumbnail: 1, isPublic: 1, _id: 1 } },
+  // get all categories
+  const categories = await Category.aggregate([
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $project: {
+        _id: 1,
+        name: 1,
+        thumbnail: 1,
+        isPublic: 1,
+      },
+    },
   ]);
 
-  // Apply pagination using the plugin
-  const options = {
-    page: parseInt(page.toString(), 10),
-    limit: parseInt(limit.toString(), 10),
-  };
-
-  const categories = await Category.aggregatePaginate(aggregate, options);
-
   // Validate the categories
-  if (!categories || categories.docs.length === 0) {
+  if (!categories || categories.length === 0) {
     return res
       .status(404)
       .json(new ApiResponse(404, null, "Categories not found"));

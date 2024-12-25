@@ -12,10 +12,11 @@ type Blog = {
   __v: number;
 };
 
-type AllBlog = {
+export type AllBlog = {
   _id: string;
   title: string;
   thumbnail: string;
+  isPublic: boolean;
 };
 
 export const fetchCreateBlog = createAsyncThunk(

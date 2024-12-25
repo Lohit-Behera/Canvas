@@ -1,10 +1,10 @@
 "use client";
 
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
 import { fetchGetAllProducts } from "@/lib/features/ProductSlice";
-import { useLayoutEffect } from "react";
-import { DataTable } from "./data-table";
+import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
 
 function Product() {
@@ -15,7 +15,7 @@ function Product() {
   const getAllProductsStatus = useSelector(
     (state: RootState) => state.product.getAllProductsStatus
   );
-  useLayoutEffect(() => {
+  useEffect(() => {
     dispatch(fetchGetAllProducts());
   }, []);
 

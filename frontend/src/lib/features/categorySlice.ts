@@ -3,7 +3,7 @@ import axios from "axios";
 import { baseUrl } from "../proxy";
 
 // types
-type Category = {
+export type Category = {
   _id: string;
   name: string;
   thumbnail: string;
@@ -107,7 +107,7 @@ const categorySlice = createSlice({
     createCategoryStatus: "idle",
     createCategoryError: {},
 
-    getAllCategories: { data: {} as AllCategories },
+    getAllCategories: { data: [] as Category[] },
     getAllCategoriesStatus: "idle",
     getAllCategoriesError: {},
 

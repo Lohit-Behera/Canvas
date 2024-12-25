@@ -90,9 +90,19 @@ const getBlog = asyncHandler(async (req, res) => {
 // get all blogs
 const getAllBlogs = asyncHandler(async (req, res) => {
   // get all blogs
-  const blogs = await Blog.find()
-    .sort({ createdAt: -1 })
-    .select("_id title thumbnail");
+  const blogs = await Blog.aggregate([
+    {
+      $sort: { createdAt: -1 },
+    },
+    {
+      $project: {
+        _id: 1,
+        title: 1,
+        thumbnail: 1,
+        isPublic: 1,
+      },
+    },
+  ]);
   // validate the blogs
   if (!blogs) {
     return res.status(404).json(new ApiResponse(404, null, "Blogs not found"));
