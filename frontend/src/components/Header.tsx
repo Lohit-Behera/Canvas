@@ -92,7 +92,7 @@ function Header() {
               <Collapsible key={index}>
                 <CollapsibleTrigger
                   asChild
-                  className="[&[data-state=open]>svg]:rotate-180"
+                  className="[&[data-state=open]>svg]:rotate-180 duration-300"
                 >
                   <Button
                     className="w-full flex justify-between"
