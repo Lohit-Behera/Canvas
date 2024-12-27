@@ -44,6 +44,7 @@ const RichTextEditor = ({
       }),
     ],
     content: value, // Set the initial content with the provided value
+    immediatelyRender: false,
     onUpdate: ({ editor }) => {
       onChange(editor.getHTML()); // Call the onChange callback with the updated HTML content
     },

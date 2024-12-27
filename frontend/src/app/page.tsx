@@ -1,12 +1,8 @@
 "use client";
 
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
-import { fetchGetRecentBlogs } from "@/lib/features/blogSlice";
-import { fetchGetRecentProducts } from "@/lib/features/ProductSlice";
-import { useEffect } from "react";
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { LayoutGrid, NotebookPen, Package2 } from "lucide-react";
 import { fetchGetCount } from "@/lib/features/baseSlice";
 

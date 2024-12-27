@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { AllProductType } from "@/lib/features/ProductSlice";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<AllProductType>[] = [
   {
@@ -120,18 +121,19 @@ export const columns: ColumnDef<AllProductType>[] = [
   {
     accessorKey: "update",
     header: () => <p className="hidden sm:table-cell">Update</p>,
-    cell: ({ row }) => (
-      <Button
-        size="icon"
-        variant="outline"
-        className="sm:flex justify-center hidden"
-        onClick={() => {
-          console.log("Update", row.original._id);
-        }}
-      >
-        <Pencil />
-      </Button>
-    ),
+    cell: ({ row }) => {
+      const router = useRouter();
+      return (
+        <Button
+          size="icon"
+          variant="outline"
+          className="sm:flex justify-center hidden"
+          onClick={() => router.push(`/product/update/${row.original._id}`)}
+        >
+          <Pencil />
+        </Button>
+      );
+    },
     enableHiding: false,
     enableSorting: false,
   },

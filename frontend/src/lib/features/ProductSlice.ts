@@ -19,12 +19,17 @@ type CreateProduct = {
 type Product = {
   _id: string;
   name: string;
-  description: string;
+  productDescription: string;
+  productDetail: string;
   affiliateLink: string;
-  price: number;
   category: string;
+  thumbnail: string;
+  images: string[];
   quantity: number;
-  image: string;
+  amount: number;
+  discount: number;
+  sellingPrice: number;
+  isPublic: boolean;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -41,17 +46,19 @@ export type AllProductType = {
   isPublic: string;
 };
 
-type AllProducts = {
-  docs: AllProductType[];
-  totalDocs: number;
-  limit: number;
-  totalPages: number;
-  page: number;
-  pagingCounter: number;
-  hasPrevPage: boolean;
-  hasNextPage: boolean;
-  prevPage: number;
-  nextPage: number;
+type UpdateProduct = {
+  _id: string;
+  name?: string;
+  productDescription?: string;
+  productDetail?: string;
+  affiliateLink?: string;
+  category?: string;
+  quantity?: number;
+  amount?: number;
+  discount?: number;
+  sellingPrice?: number;
+  isPublic?: boolean;
+  thumbnail?: File;
 };
 
 // fetch functions
@@ -130,6 +137,43 @@ export const fetchGetRecentProducts = createAsyncThunk(
   }
 );
 
+export const fetchUpdateProduct = createAsyncThunk(
+  "product/updateProduct",
+  async (product: UpdateProduct, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/products/update/${product._id}`,
+        {
+          name: product.name,
+          productDescription: product.productDescription,
+          productDetail: product.productDetail,
+          affiliateLink: product.affiliateLink,
+          category: product.category,
+          quantity: product.quantity,
+          amount: product.amount,
+          discount: product.discount,
+          sellingPrice: product.sellingPrice,
+          isPublic: product.isPublic,
+          thumbnail: product.thumbnail,
+        },
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 // slice
 const productSlice = createSlice({
   name: "product",
@@ -149,6 +193,10 @@ const productSlice = createSlice({
     getRecentProducts: { data: [] as AllProductType[] },
     getRecentProductsStatus: "idle",
     getRecentProductsError: {},
+
+    updateProduct: { data: "" },
+    updateProductStatus: "idle",
+    updateProductError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -204,6 +252,19 @@ const productSlice = createSlice({
         state.getRecentProductsStatus = "failed";
         state.getRecentProductsError =
           action.payload || "Failed to get recent products";
+      })
+
+      // Update Product
+      .addCase(fetchUpdateProduct.pending, (state) => {
+        state.updateProductStatus = "loading";
+      })
+      .addCase(fetchUpdateProduct.fulfilled, (state, action) => {
+        state.updateProductStatus = "succeeded";
+        state.updateProduct = action.payload;
+      })
+      .addCase(fetchUpdateProduct.rejected, (state, action) => {
+        state.updateProductStatus = "failed";
+        state.updateProductError = action.payload || "Failed to update product";
       });
   },
 });
