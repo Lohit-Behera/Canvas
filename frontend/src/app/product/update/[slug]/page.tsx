@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
 import {
@@ -10,7 +11,13 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -89,7 +96,7 @@ const updateProductSchema = z.object({
 
 function UpdateProduct({ params }: { params: { slug: string } }) {
   const dispatch = useDispatch<AppDispatch>();
-
+  const router = useRouter();
   const [editThumbnail, setEditThumbnail] = useState(false);
 
   const getProduct = useSelector(
@@ -479,6 +486,22 @@ function UpdateProduct({ params }: { params: { slug: string } }) {
               </form>
             </Form>
           </CardContent>
+          <CardFooter className="flex flex-col space-y-2 items-start">
+            <h3 className="text-base md:text-lg font-semibold">
+              To Add More Images Click on Add More Images
+            </h3>
+            <Button
+              className="w-full"
+              variant="secondary"
+              size="sm"
+              onClick={(e) => {
+                e.preventDefault();
+                router.push(`/product/add/image/${getProduct._id}`);
+              }}
+            >
+              Add More Images
+            </Button>
+          </CardFooter>
         </Card>
       ) : null}
     </>

@@ -174,6 +174,31 @@ export const fetchUpdateProduct = createAsyncThunk(
   }
 );
 
+export const fetchAddMoreImagesToProduct = createAsyncThunk(
+  "product/addMoreImagesToProduct",
+  async (formData: FormData, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/products/add/images/${formData.get("_id")}`,
+        formData,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 // slice
 const productSlice = createSlice({
   name: "product",
@@ -197,6 +222,10 @@ const productSlice = createSlice({
     updateProduct: { data: "" },
     updateProductStatus: "idle",
     updateProductError: {},
+
+    addMoreImagesToProduct: { data: "" },
+    addMoreImagesToProductStatus: "idle",
+    addMoreImagesToProductError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -265,6 +294,20 @@ const productSlice = createSlice({
       .addCase(fetchUpdateProduct.rejected, (state, action) => {
         state.updateProductStatus = "failed";
         state.updateProductError = action.payload || "Failed to update product";
+      })
+
+      // Add More Images To Product
+      .addCase(fetchAddMoreImagesToProduct.pending, (state) => {
+        state.addMoreImagesToProductStatus = "loading";
+      })
+      .addCase(fetchAddMoreImagesToProduct.fulfilled, (state, action) => {
+        state.addMoreImagesToProductStatus = "succeeded";
+        state.addMoreImagesToProduct = action.payload;
+      })
+      .addCase(fetchAddMoreImagesToProduct.rejected, (state, action) => {
+        state.addMoreImagesToProductStatus = "failed";
+        state.addMoreImagesToProductError =
+          action.payload || "Failed to add more images to product";
       });
   },
 });

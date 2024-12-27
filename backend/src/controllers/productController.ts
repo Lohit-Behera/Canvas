@@ -168,6 +168,7 @@ const getRecentProducts = asyncHandler(async (req, res) => {
 const updateProduct = asyncHandler(async (req, res) => {
   // get product id from the params
   const { productId } = req.params;
+
   // Joi schema for validation
   const ProductSchema = Joi.object({
     name: Joi.string().optional(),
@@ -189,22 +190,9 @@ const updateProduct = asyncHandler(async (req, res) => {
       .status(400)
       .json(new ApiResponse(400, null, error.details[0].message));
   }
-  const {
-    name,
-    productDescription,
-    productDetail,
-    affiliateLink,
-    category,
-    amount,
-    discount,
-    sellingPrice,
-    quantity,
-    isPublic,
-  } = value;
 
   // get the product
   const product = await Product.findById(productId);
-  // validate the product
   if (!product) {
     return res
       .status(404)
@@ -214,53 +202,104 @@ const updateProduct = asyncHandler(async (req, res) => {
   // get thumbnail
   const thumbnail = req.file;
   if (thumbnail) {
-    // delete the old thumbnail
-    deleteFile(product.thumbnail, res);
-    // upload image to cloudinary
+    deleteFile(product.thumbnail, res); // delete old thumbnail
     const thumbnailUrl = await uploadFile(thumbnail);
-    // validate the image url
     if (!thumbnailUrl) {
       return res
         .status(500)
         .json(new ApiResponse(500, null, "Image upload failed"));
     }
-    // update the thumbnail
-    product.thumbnail = thumbnailUrl;
+    product.thumbnail = thumbnailUrl; // update thumbnail
   }
-  // update the product that is changed
-  if (name !== product.name && name !== "") {
-    product.name = name;
-  } else if (
-    productDescription !== product.productDescription &&
-    productDescription !== ""
-  ) {
-    product.productDescription = productDescription;
-  } else if (productDetail !== product.productDetail && productDetail !== "") {
-    product.productDetail = productDetail;
-  } else if (category !== product.category && category !== "") {
-    product.category = category;
-  } else if (affiliateLink !== product.affiliateLink && affiliateLink !== "") {
-    product.affiliateLink = affiliateLink;
-  } else if (amount !== product.amount && amount !== undefined) {
-    product.amount = amount;
-  } else if (discount !== product.discount && discount !== undefined) {
-    product.discount = discount;
-  } else if (
-    sellingPrice !== product.sellingPrice &&
-    sellingPrice !== undefined
-  ) {
-    product.sellingPrice = sellingPrice;
-  } else if (isPublic !== product.isPublic && isPublic !== undefined) {
-    product.isPublic = isPublic;
-  } else {
+
+  // Update fields if they are provided and different
+  const fieldsToUpdate = [
+    "name",
+    "productDescription",
+    "productDetail",
+    "category",
+    "affiliateLink",
+    "amount",
+    "discount",
+    "sellingPrice",
+    "quantity",
+    "isPublic",
+  ];
+
+  let hasUpdates = false;
+
+  fieldsToUpdate.forEach((field) => {
+    if (value[field] !== undefined && value[field] !== product[field]) {
+      product[field] = value[field];
+      hasUpdates = true;
+    }
+  });
+
+  if (!hasUpdates && !thumbnail) {
     return res
       .status(400)
       .json(new ApiResponse(400, null, "No fields to update"));
   }
 
+  // Save updated product
+  const updatedProduct = await product.save({ validateBeforeSave: false });
+  if (!updatedProduct) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Product update failed"));
+  }
+
+  return res
+    .status(200)
+    .json(
+      new ApiResponse(200, updatedProduct._id, "Product updated successfully")
+    );
+});
+
+// add more images to a product
+const addMoreImagesToProduct = asyncHandler(async (req, res) => {
+  // get product id from the params
+  const { productId } = req.params;
+
+  // get images
+  const images = req.files;
+  if (!images || !Array.isArray(images)) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Please select at least one image"));
+  }
+
+  // upload images
+  const imageUrls = await Promise.all(
+    images.map(async (image: Express.Multer.File) => {
+      const imageUrl = await uploadFile(image);
+      if (!imageUrl) {
+        return res
+          .status(500)
+          .json(new ApiResponse(500, null, "Image upload failed"));
+      }
+      return imageUrl;
+    })
+  );
+  // get the product
+  const product = await Product.findById(productId);
+
+  // validate the product
+  if (!product) {
+    return res
+      .status(404)
+      .json(new ApiResponse(404, null, "Product not found"));
+  }
+
+  // add images to the product
+  if (product.images && product.images.length > 0) {
+    product.images.push(...imageUrls);
+  } else {
+    product.images = imageUrls;
+  }
+
   // save the product
   const updatedProduct = await product.save({ validateBeforeSave: false });
-  // validate the product
   if (!updatedProduct) {
     return res
       .status(500)
@@ -270,7 +309,11 @@ const updateProduct = asyncHandler(async (req, res) => {
   return res
     .status(200)
     .json(
-      new ApiResponse(200, updatedProduct._id, "Product updated successfully")
+      new ApiResponse(
+        200,
+        updatedProduct._id,
+        "Product images added successfully"
+      )
     );
 });
 
@@ -280,4 +323,5 @@ export {
   getAllProducts,
   getRecentProducts,
   updateProduct,
+  addMoreImagesToProduct,
 };

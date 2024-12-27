@@ -11,73 +11,68 @@ export const resizeImage = async (
   res: Response,
   next: NextFunction
 ): Promise<void> => {
-  const files: Record<string, Express.Multer.File[]> | null =
-    (req.files as Record<string, Express.Multer.File[]> | null) ||
-    (req.file ? { image: [req.file as Express.Multer.File] } : null);
+  try {
+    const files = req.files as Express.Multer.File[]; // Ensure files are accessed as an array
 
-  if (files) {
-    try {
-      const fileFields = Object.keys(files);
-
-      for (const fieldName of fileFields) {
-        const fileArray = files[fieldName];
-
-        for (const file of fileArray) {
-          const originalName = file.originalname;
-          const metadata = await sharp(file.buffer || file.path).metadata();
-          const aspectRatio = (metadata.width || 1) / (metadata.height || 1);
-
-          let newWidth = Math.min(1440, metadata.width || 1440);
-          let newHeight = Math.round(newWidth / aspectRatio);
-
-          if (newHeight > 1080) {
-            newHeight = 1080;
-            newWidth = Math.round(newHeight * aspectRatio);
-          }
-
-          if (process.env.MEMORY === "true") {
-            const resizedImageBuffer = await sharp(file.buffer)
-              .resize(newWidth, newHeight)
-              .toFormat("jpeg")
-              .jpeg({ quality: 70 })
-              .toBuffer();
-
-            file.buffer = resizedImageBuffer;
-            file.filename = `resized-${Date.now()}-${originalName}`;
-          } else {
-            const imagePath = path.join(__dirname, file.path);
-            const outputFilePath = path.join(
-              __dirname,
-              "./public/temp",
-              `resized-${Date.now()}-${file.filename}`
-            );
-
-            await sharp(imagePath)
-              .resize(newWidth, newHeight)
-              .toFormat("jpeg")
-              .jpeg({ quality: 70 })
-              .toFile(outputFilePath);
-
-            fs.unlinkSync(imagePath);
-            file.path = outputFilePath;
-            file.filename = `resized-${Date.now()}-${file.filename}`;
-          }
-        }
-      }
-      next();
-    } catch (err) {
-      console.error("Error processing image:", err);
-      res
-        .status(500)
-        .json(
-          new ApiResponse(
-            500,
-            (err as Error).message,
-            "Something went wrong while processing the images"
-          )
-        );
+    if (!files || files.length === 0) {
+      return next(); // Skip if no files are uploaded
     }
-  } else {
-    next();
+
+    for (const file of files) {
+      const originalName = file.originalname;
+      const metadata = await sharp(file.buffer).metadata();
+      const aspectRatio = (metadata.width || 1) / (metadata.height || 1);
+
+      let newWidth = Math.min(1440, metadata.width || 1440);
+      let newHeight = Math.round(newWidth / aspectRatio);
+
+      if (newHeight > 1080) {
+        newHeight = 1080;
+        newWidth = Math.round(newHeight * aspectRatio);
+      }
+
+      if (process.env.MEMORY === "true") {
+        // If processing in memory (buffer)
+        const resizedImageBuffer = await sharp(file.buffer)
+          .resize(newWidth, newHeight)
+          .toFormat("jpeg")
+          .jpeg({ quality: 70 })
+          .toBuffer();
+
+        file.buffer = resizedImageBuffer;
+        file.filename = `resized-${Date.now()}-${originalName}`;
+      } else {
+        // If processing on disk (toFile)
+        const imagePath = path.join(__dirname, file.path);
+        const outputFilePath = path.join(
+          __dirname,
+          "./public/temp",
+          `resized-${Date.now()}-${file.filename}`
+        );
+
+        await sharp(imagePath)
+          .resize(newWidth, newHeight)
+          .toFormat("jpeg")
+          .jpeg({ quality: 70 })
+          .toFile(outputFilePath);
+
+        fs.unlinkSync(imagePath); // Delete the original file after resizing
+        file.path = outputFilePath;
+        file.filename = `resized-${Date.now()}-${file.filename}`;
+      }
+    }
+
+    next(); // Proceed to the next middleware
+  } catch (err) {
+    console.error("Error processing image:", err);
+    res
+      .status(500)
+      .json(
+        new ApiResponse(
+          500,
+          (err as Error).message,
+          "Something went wrong while processing the images"
+        )
+      );
   }
 };
