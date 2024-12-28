@@ -5,6 +5,8 @@ import StoreProvider from "./StoreProvider";
 import Header from "@/components/Header";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,13 +41,16 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
-            <div className="w-full min-h-screen flex flex-col justify-center items-center">
-              <Header />
-              <main className="w-full flex-1 flex justify-center items-center my-6">
-                {children}
-              </main>
-            </div>
-            <Toaster richColors />
+            <SidebarProvider>
+              <AppSidebar />
+              <div className="w-full min-h-screen flex flex-col justify-center items-center">
+                <Header />
+                <main className="w-full flex-1 flex justify-center items-center my-6">
+                  {children}
+                </main>
+              </div>
+              <Toaster richColors />
+            </SidebarProvider>
           </ThemeProvider>
         </StoreProvider>
       </body>
