@@ -44,7 +44,7 @@ function LoginPage() {
     if (userInfo) {
       router.push("/");
     }
-  }, []);
+  }, [userInfo]);
 
   const form = useForm<z.infer<typeof loginFormSchema>>({
     resolver: zodResolver(loginFormSchema),

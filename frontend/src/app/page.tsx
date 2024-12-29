@@ -5,8 +5,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "@/lib/store";
 import { LayoutGrid, NotebookPen, Package2 } from "lucide-react";
 import { fetchGetCount } from "@/lib/features/baseSlice";
+import { withAuth } from "@/components/withAuth";
 
-export default function Home() {
+function Home() {
   const dispatch = useDispatch<AppDispatch>();
   const getCount = useSelector((state: RootState) => state.base.getCount.data);
   const getCountStatus = useSelector(
@@ -60,3 +61,4 @@ export default function Home() {
     </>
   );
 }
+export default withAuth(Home);

@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
 import { fetchCreateBlog } from "@/lib/features/blogSlice";
 import dynamic from "next/dynamic";
+import { withAuth } from "@/components/withAuth";
 const RichTextEditor = dynamic(() => import("@/components/TextEditor"), {
   ssr: false,
 });
@@ -226,4 +227,4 @@ function CreateBlog() {
   );
 }
 
-export default CreateBlog;
+export default withAuth(CreateBlog);

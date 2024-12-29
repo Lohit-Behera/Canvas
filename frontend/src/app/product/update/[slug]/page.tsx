@@ -41,6 +41,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { fetchGetAllCategoriesNames } from "@/lib/features/categorySlice";
 import { toast } from "sonner";
 import { Pencil, X } from "lucide-react";
+import { withAuth } from "@/components/withAuth";
 
 const updateProductSchema = z.object({
   name: z
@@ -508,4 +509,4 @@ function UpdateProduct({ params }: { params: { slug: string } }) {
   );
 }
 
-export default UpdateProduct;
+export default withAuth(UpdateProduct);

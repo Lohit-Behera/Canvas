@@ -20,6 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { fetchCreateCategory } from "@/lib/features/categorySlice";
+import { withAuth } from "@/components/withAuth";
 
 const createCategorySchema = z.object({
   name: z
@@ -40,7 +41,7 @@ const createCategorySchema = z.object({
     }),
 });
 
-function page() {
+function AddCategory() {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
 
@@ -142,4 +143,4 @@ function page() {
   );
 }
 
-export default page;
+export default withAuth(AddCategory);

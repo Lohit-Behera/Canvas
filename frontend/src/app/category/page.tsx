@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "@/lib/store";
 import { fetchGetAllCategories } from "@/lib/features/categorySlice";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
+import { withAuth } from "@/components/withAuth";
 
 function Category() {
   const dispatch = useDispatch<AppDispatch>();
@@ -35,4 +36,4 @@ function Category() {
   );
 }
 
-export default Category;
+export default withAuth(Category);

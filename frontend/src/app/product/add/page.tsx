@@ -31,6 +31,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { toast } from "sonner";
 import { useEffect } from "react";
 import { fetchGetAllCategoriesNames } from "@/lib/features/categorySlice";
+import { withAuth } from "@/components/withAuth";
 
 const createProductSchema = z.object({
   name: z
@@ -393,4 +394,4 @@ function AddProduct() {
   );
 }
 
-export default AddProduct;
+export default withAuth(AddProduct);

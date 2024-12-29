@@ -6,8 +6,9 @@ import { fetchGetAllBlogs } from "@/lib/features/blogSlice";
 import { useLayoutEffect } from "react";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
+import { withAuth } from "@/components/withAuth";
 
-function page() {
+function AllBlogs() {
   const dispatch = useDispatch<AppDispatch>();
 
   const getAllBlogs = useSelector(
@@ -38,4 +39,4 @@ function page() {
   );
 }
 
-export default page;
+export default withAuth(AllBlogs);

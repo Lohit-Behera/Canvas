@@ -6,6 +6,7 @@ import { AppDispatch, RootState } from "@/lib/store";
 import { fetchGetAllProducts } from "@/lib/features/ProductSlice";
 import { DataTable } from "@/components/data-table";
 import { columns } from "./columns";
+import { withAuth } from "@/components/withAuth";
 
 function Product() {
   const dispatch = useDispatch<AppDispatch>();
@@ -34,4 +35,4 @@ function Product() {
   );
 }
 
-export default Product;
+export default withAuth(Product);
