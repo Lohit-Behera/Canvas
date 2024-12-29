@@ -57,14 +57,29 @@ const createProduct = asyncHandler(async (req, res) => {
       .status(400)
       .json(new ApiResponse(400, null, "Invalid image format"));
   }
+  // get big image from the request
+  const bigImage = req.file;
+  // validate the image
+  if (!bigImage) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Image is required"));
+  }
+  if (bigImage.mimetype !== "image/jpeg" && bigImage.mimetype !== "image/png") {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "Invalid image format"));
+  }
   // upload image to cloudinary
   const thumbnailUrl = await uploadFile(thumbnail);
+  const bigImageUrl = await uploadFile(bigImage);
   // validate the image url
-  if (!thumbnailUrl) {
+  if (!thumbnailUrl || !bigImageUrl) {
     return res
       .status(500)
       .json(new ApiResponse(500, null, "Image upload failed"));
   }
+
   // create the product
   const product = await Product.create({
     name,
@@ -78,6 +93,7 @@ const createProduct = asyncHandler(async (req, res) => {
     quantity,
     thumbnail: thumbnailUrl,
     isPublic,
+    bigImage: bigImageUrl,
   });
   // validate the product creation
   const createdProduct = await Product.findById(product._id);
@@ -255,73 +271,10 @@ const updateProduct = asyncHandler(async (req, res) => {
       new ApiResponse(200, updatedProduct._id, "Product updated successfully")
     );
 });
-
-// add more images to a product
-const addMoreImagesToProduct = asyncHandler(async (req, res) => {
-  // get product id from the params
-  const { productId } = req.params;
-
-  // get images
-  const images = req.files;
-  if (!images || !Array.isArray(images)) {
-    return res
-      .status(400)
-      .json(new ApiResponse(400, null, "Please select at least one image"));
-  }
-
-  // upload images
-  const imageUrls = await Promise.all(
-    images.map(async (image: Express.Multer.File) => {
-      const imageUrl = await uploadFile(image);
-      if (!imageUrl) {
-        return res
-          .status(500)
-          .json(new ApiResponse(500, null, "Image upload failed"));
-      }
-      return imageUrl;
-    })
-  );
-  // get the product
-  const product = await Product.findById(productId);
-
-  // validate the product
-  if (!product) {
-    return res
-      .status(404)
-      .json(new ApiResponse(404, null, "Product not found"));
-  }
-
-  // add images to the product
-  if (product.images && product.images.length > 0) {
-    product.images.push(...imageUrls);
-  } else {
-    product.images = imageUrls;
-  }
-
-  // save the product
-  const updatedProduct = await product.save({ validateBeforeSave: false });
-  if (!updatedProduct) {
-    return res
-      .status(500)
-      .json(new ApiResponse(500, null, "Product update failed"));
-  }
-  // send the response
-  return res
-    .status(200)
-    .json(
-      new ApiResponse(
-        200,
-        updatedProduct._id,
-        "Product images added successfully"
-      )
-    );
-});
-
 export {
   createProduct,
   getProduct,
   getAllProducts,
   getRecentProducts,
   updateProduct,
-  addMoreImagesToProduct,
 };

@@ -11,13 +11,7 @@ import {
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -68,6 +62,15 @@ const updateProductSchema = z.object({
       message: "Only .jpg and .png formats are supported.",
     })
     .optional(),
+  bigImage: z
+    .any()
+    .refine((file) => file instanceof File, {
+      message: "Image is required.",
+    })
+    .refine((file) => ["image/jpeg", "image/png"].includes(file?.type), {
+      message: "Only .jpg and .png formats are supported.",
+    })
+    .optional(),
   amount: z
     .number()
     .positive({ message: "Amount must be a positive number" })
@@ -99,6 +102,7 @@ function UpdateProduct({ params }: { params: { slug: string } }) {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
   const [editThumbnail, setEditThumbnail] = useState(false);
+  const [editBigImage, setEditBigImage] = useState(false);
 
   const getProduct = useSelector(
     (state: RootState) => state.product.getProduct.data
@@ -422,6 +426,59 @@ function UpdateProduct({ params }: { params: { slug: string } }) {
                 />
                 <FormField
                   control={form.control}
+                  name="bigImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Big Image</FormLabel>
+                      {editBigImage ? (
+                        <>
+                          <FormControl>
+                            <div className="flex items-center gap-2">
+                              <Input
+                                type="file"
+                                onChange={(e) =>
+                                  field.onChange(e.target.files?.[0] || null)
+                                }
+                                placeholder="Big Image"
+                              />
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setEditBigImage(false);
+                                }}
+                              >
+                                <X />
+                              </Button>
+                            </div>
+                          </FormControl>
+                          <FormMessage />
+                        </>
+                      ) : (
+                        <div className="flex items-center gap-2">
+                          <img
+                            src={getProduct.bigImage}
+                            alt=""
+                            className="h-40 w-40 rounded-md object-cover"
+                          />
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={(e) => {
+                              e.preventDefault();
+                              setEditBigImage(true);
+                            }}
+                          >
+                            <Pencil />
+                          </Button>
+                        </div>
+                      )}
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="isPublic"
                   render={({ field }) => (
                     <FormItem className="flex flex-row items-start space-x-3 space-y-0">
@@ -487,22 +544,6 @@ function UpdateProduct({ params }: { params: { slug: string } }) {
               </form>
             </Form>
           </CardContent>
-          <CardFooter className="flex flex-col space-y-2 items-start">
-            <h3 className="text-base md:text-lg font-semibold">
-              To Add More Images Click on Add More Images
-            </h3>
-            <Button
-              className="w-full"
-              variant="secondary"
-              size="sm"
-              onClick={(e) => {
-                e.preventDefault();
-                router.push(`/product/add/image/${getProduct._id}`);
-              }}
-            >
-              Add More Images
-            </Button>
-          </CardFooter>
         </Card>
       ) : null}
     </>

@@ -7,14 +7,13 @@ import {
   getAllProducts,
   getRecentProducts,
   updateProduct,
-  addMoreImagesToProduct,
 } from "../controllers/productController";
 
 const productRouter = Router();
 // create product
 productRouter.post(
   "/create",
-  upload.single("thumbnail"),
+  upload.fields([{ name: "thumbnail" }, { name: "bigImage" }]),
   resizeImage,
   createProduct
 );
@@ -30,12 +29,5 @@ productRouter.patch(
   upload.single("thumbnail"),
   resizeImage,
   updateProduct
-);
-// add more images to product
-productRouter.patch(
-  "/add/images/:productId",
-  upload.array("images", 5),
-  resizeImage,
-  addMoreImagesToProduct
 );
 export default productRouter;

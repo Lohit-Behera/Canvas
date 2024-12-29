@@ -57,6 +57,17 @@ const createProductSchema = z.object({
     .refine((file) => ["image/jpeg", "image/png"].includes(file?.type), {
       message: "Only .jpg and .png formats are supported.",
     }),
+  bigImage: z
+    .any()
+    .refine((file) => file instanceof File, {
+      message: "Thumbnail is required.",
+    })
+    .refine((file) => file?.size <= 3 * 1024 * 1024, {
+      message: "Thumbnail size must be less than 3MB.",
+    })
+    .refine((file) => ["image/jpeg", "image/png"].includes(file?.type), {
+      message: "Only .jpg and .png formats are supported.",
+    }),
   amount: z
     .number()
     .positive({ message: "Amount must be a positive number" })
@@ -315,6 +326,25 @@ function AddProduct() {
                             field.onChange(e.target.files?.[0] || null)
                           }
                           placeholder="Thumbnail"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="bigImage"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Big Image</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="file"
+                          onChange={(e) =>
+                            field.onChange(e.target.files?.[0] || null)
+                          }
+                          placeholder="Big Image"
                         />
                       </FormControl>
                       <FormMessage />
