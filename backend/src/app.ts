@@ -18,11 +18,13 @@ import productRouter from "./routes/productRoute";
 import blogRouter from "./routes/blogRoutes";
 import categoryRouter from "./routes/categoryRoutes";
 import baseRouter from "./routes/baseRoutes";
+import userRouter from "./routes/userRoutes";
 
 // Routes
 app.use("/api/v1/products", productRouter);
 app.use("/api/v1/blogs", blogRouter);
 app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/base", baseRouter);
+app.use("/api/v1/users", userRouter);
 
 export { app };

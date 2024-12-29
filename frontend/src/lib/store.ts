@@ -3,6 +3,7 @@ import ProductSlice from "./features/ProductSlice";
 import blogSlice from "./features/blogSlice";
 import categorySlice from "./features/categorySlice";
 import baseSlice from "./features/baseSlice";
+import userSlice from "./features/userSlice";
 
 export const makeStore = () => {
   return configureStore({
@@ -11,6 +12,7 @@ export const makeStore = () => {
       blog: blogSlice,
       category: categorySlice,
       base: baseSlice,
+      user: userSlice,
     },
   });
 };
