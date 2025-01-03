@@ -7,6 +7,10 @@ type Blog = {
   title: string;
   content: string;
   thumbnail: string;
+  isPublic: boolean;
+  seoTitle: string;
+  seoDescription: string;
+  seoKeywords: string;
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -95,6 +99,43 @@ export const fetchGetRecentBlogs = createAsyncThunk(
   }
 );
 
+export const fetchUpdateBlog = createAsyncThunk(
+  "blog/updateBlog",
+  async (
+    updatedBlog: {
+      _id: string;
+      title?: string;
+      content?: string;
+      thumbnail?: File;
+      seoTitle?: string;
+      seoDescription?: string;
+      seoKeywords?: string;
+      isPublic: boolean;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/blogs/update/${updatedBlog._id}`,
+        updatedBlog,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 export const blogSlice = createSlice({
   name: "blog",
   initialState: {
@@ -113,6 +154,10 @@ export const blogSlice = createSlice({
     getRecentBlogs: { data: [] as AllBlog[] },
     getRecentBlogsStatus: "idle",
     getRecentBlogsError: {},
+
+    updateBlog: { data: "" },
+    updateBlogStatus: "idle",
+    updateBlogError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -167,6 +212,19 @@ export const blogSlice = createSlice({
         state.getRecentBlogsStatus = "failed";
         state.getRecentBlogsError =
           action.payload || "Failed to get recent blogs";
+      })
+
+      // Update Blog
+      .addCase(fetchUpdateBlog.pending, (state) => {
+        state.updateBlogStatus = "loading";
+      })
+      .addCase(fetchUpdateBlog.fulfilled, (state, action) => {
+        state.updateBlogStatus = "succeeded";
+        state.updateBlog = action.payload;
+      })
+      .addCase(fetchUpdateBlog.rejected, (state, action) => {
+        state.updateBlogStatus = "failed";
+        state.updateBlogError = action.payload || "Failed to update blog";
       });
   },
 });

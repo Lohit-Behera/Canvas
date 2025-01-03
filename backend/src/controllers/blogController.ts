@@ -130,4 +130,90 @@ const getRecentBlogs = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, blogs, "Blogs found successfully"));
 });
 
-export { createBlog, getBlog, getAllBlogs, getRecentBlogs };
+// update blog
+const updateBlog = asyncHandler(async (req, res) => {
+  // get blog id from the params
+  const { blogId } = req.params;
+  // joi schema for validation
+  const schema = Joi.object({
+    _id: Joi.string().optional(),
+    title: Joi.string().min(3).max(50).optional(),
+    content: Joi.string().optional(),
+    isPublic: Joi.boolean().optional(),
+    seoTitle: Joi.string().allow("").optional(),
+    seoDescription: Joi.string().allow("").optional(),
+    seoKeywords: Joi.string().allow("").optional(),
+  });
+  // Validate request body
+  const { error, value } = schema.validate(req.body);
+  if (error) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, error.details[0].message));
+  }
+  // get the blog
+  const blog = await Blog.findById(blogId);
+  if (!blog) {
+    return res.status(404).json(new ApiResponse(404, null, "Blog not found"));
+  }
+  // get thumbnail from the request
+  const thumbnail = req.file;
+  if (thumbnail) {
+    if (
+      thumbnail.mimetype !== "image/jpeg" &&
+      thumbnail.mimetype !== "image/png"
+    ) {
+      return res
+        .status(400)
+        .json(new ApiResponse(400, null, "Invalid image format"));
+    }
+    // upload thumbnail to cloudinary
+    const thumbnailUrl = await uploadFile(thumbnail);
+    // validate the thumbnail url
+    if (!thumbnailUrl) {
+      return res
+        .status(500)
+        .json(new ApiResponse(500, null, "Image upload failed"));
+    }
+    blog.thumbnail = thumbnailUrl;
+  }
+
+  // Update fields if they are provided and different
+  const fieldsToUpdate = [
+    "title",
+    "content",
+    "seoTitle",
+    "seoDescription",
+    "seoKeywords",
+    "isPublic",
+  ];
+  let hasUpdates = false;
+
+  fieldsToUpdate.forEach((field) => {
+    if (value[field] !== undefined && value[field] !== blog[field]) {
+      blog[field] = value[field];
+      hasUpdates = true;
+    }
+  });
+
+  if (!hasUpdates && !thumbnail) {
+    return res
+      .status(400)
+      .json(new ApiResponse(400, null, "No fields to update"));
+  }
+
+  // Save updated blog
+  const updatedBlog = await blog.save({ validateBeforeSave: false });
+  // validate the blog
+  if (!updatedBlog) {
+    return res
+      .status(500)
+      .json(new ApiResponse(500, null, "Blog update failed"));
+  }
+  // send the response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, updatedBlog, "Blog updated successfully"));
+});
+
+export { createBlog, getBlog, getAllBlogs, getRecentBlogs, updateBlog };

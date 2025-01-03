@@ -4,6 +4,7 @@ import { ColumnDef } from "@tanstack/react-table";
 import { AllBlog } from "@/lib/features/blogSlice";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<AllBlog>[] = [
   {
@@ -45,6 +46,25 @@ export const columns: ColumnDef<AllBlog>[] = [
         <div className="flex items-center gap-2 w-full h-full">
           {row.original.isPublic ? "Public" : "Private"}
         </div>
+      );
+    },
+  },
+  {
+    accessorKey: "update",
+    header: "Update",
+    cell: ({ row }) => {
+      const router = useRouter();
+      return (
+        <Button
+          size="icon"
+          variant="outline"
+          className="sm:flex justify-center hidden"
+          onClick={() => {
+            router.push(`/blog/update/${row.original._id}`);
+          }}
+        >
+          <Pencil />
+        </Button>
       );
     },
   },
