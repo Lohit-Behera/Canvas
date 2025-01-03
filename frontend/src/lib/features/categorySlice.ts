@@ -100,6 +100,63 @@ export const fetchGetAllCategoriesNames = createAsyncThunk(
   }
 );
 
+export const fetchGetCategory = createAsyncThunk(
+  "category/getCategory",
+  async (categoryId: string, { rejectWithValue }) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.get(
+        `${baseUrl}/api/v1/categories/get/${categoryId}`,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
+export const fetchUpdateCategory = createAsyncThunk(
+  "category/updateCategory",
+  async (
+    category: {
+      _id: string;
+      name?: string;
+      thumbnail?: File;
+      isPublic: boolean;
+    },
+    { rejectWithValue }
+  ) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      };
+      const { data } = await axios.patch(
+        `${baseUrl}/api/v1/categories/update/${category._id}`,
+        category,
+        config
+      );
+      return data;
+    } catch (error: any) {
+      const errorMessage =
+        error.response && error.response.data
+          ? error.response.data.message
+          : error.message;
+      return rejectWithValue(errorMessage);
+    }
+  }
+);
+
 const categorySlice = createSlice({
   name: "category",
   initialState: {
@@ -114,6 +171,14 @@ const categorySlice = createSlice({
     getAllCategoriesNames: { data: [] as { name: string; _id: string }[] },
     getAllCategoriesNamesStatus: "idle",
     getAllCategoriesNamesError: {},
+
+    getCategory: { data: {} as Category },
+    getCategoryStatus: "idle",
+    getCategoryError: {},
+
+    updateCategory: { data: "" },
+    updateCategoryStatus: "idle",
+    updateCategoryError: {},
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -157,6 +222,33 @@ const categorySlice = createSlice({
         state.getAllCategoriesNamesStatus = "failed";
         state.getAllCategoriesNamesError =
           action.payload || "Failed to get categories names";
+      })
+
+      // get category
+      .addCase(fetchGetCategory.pending, (state) => {
+        state.getCategoryStatus = "loading";
+      })
+      .addCase(fetchGetCategory.fulfilled, (state, action) => {
+        state.getCategoryStatus = "succeeded";
+        state.getCategory = action.payload;
+      })
+      .addCase(fetchGetCategory.rejected, (state, action) => {
+        state.getCategoryStatus = "failed";
+        state.getCategoryError = action.payload || "Failed to get category";
+      })
+
+      // update category
+      .addCase(fetchUpdateCategory.pending, (state) => {
+        state.updateCategoryStatus = "loading";
+      })
+      .addCase(fetchUpdateCategory.fulfilled, (state, action) => {
+        state.updateCategoryStatus = "succeeded";
+        state.updateCategory = action.payload;
+      })
+      .addCase(fetchUpdateCategory.rejected, (state, action) => {
+        state.updateCategoryStatus = "failed";
+        state.updateCategoryError =
+          action.payload || "Failed to update category";
       });
   },
 });

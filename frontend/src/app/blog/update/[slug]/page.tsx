@@ -180,7 +180,7 @@ function UpdateBlog({ params }: { params: { slug: string } }) {
                             <img
                               src={getBlog?.thumbnail}
                               alt={getBlog?.title}
-                              className="w-40 h-40"
+                              className="w-40 h-40 rounded-lg object-cover"
                             />
                             <Button
                               variant={"outline"}

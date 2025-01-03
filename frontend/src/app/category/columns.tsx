@@ -3,6 +3,7 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown, Pencil } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export const columns: ColumnDef<any>[] = [
   {
@@ -59,12 +60,13 @@ export const columns: ColumnDef<any>[] = [
     accessorKey: "update",
     header: "Update",
     cell: ({ row }) => {
+      const router = useRouter();
       return (
         <Button
           size="icon"
-          variant="ghost"
+          variant="outline"
           onClick={() => {
-            console.log(row.original);
+            router.push(`/category/update/${row.original._id}`);
           }}
         >
           <Pencil className="h-4 w-4" />

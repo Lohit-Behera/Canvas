@@ -5,6 +5,8 @@ import {
   createCategory,
   getAllCategories,
   getAllCategoriesNames,
+  getCategory,
+  updateCategory,
 } from "../controllers/categoryController";
 
 const categoryRouter = Router();
@@ -17,5 +19,12 @@ categoryRouter.post(
 );
 categoryRouter.get("/get/all", getAllCategories);
 categoryRouter.get("/get/names", getAllCategoriesNames);
+categoryRouter.get("/get/:categoryId", getCategory);
+categoryRouter.patch(
+  "/update/:categoryId",
+  upload.single("thumbnail"),
+  resizeImage,
+  updateCategory
+);
 
 export default categoryRouter;
